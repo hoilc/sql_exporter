@@ -19,6 +19,7 @@ import (
 	//_ "github.com/segmentio/go-athena" // register the AWS Athena driver
 	//"github.com/snowflakedb/gosnowflake"
 	//_ "github.com/vertica/vertica-sql-go" // register the Vertica driver
+	_ "github.com/hoilc/go-impala"
 )
 
 var (

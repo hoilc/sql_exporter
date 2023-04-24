@@ -6,6 +6,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/go-kit/log v0.2.1
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/hoilc/go-impala v0.0.0-20230424081608-c103e4695441
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/common v0.39.0
@@ -14,6 +15,7 @@ require (
 )
 
 require (
+	github.com/apache/thrift v0.18.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
