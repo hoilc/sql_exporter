@@ -4,22 +4,21 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
-	_ "github.com/ClickHouse/clickhouse-go/v2" // register the ClickHouse driver
+	//_ "github.com/ClickHouse/clickhouse-go/v2" // register the ClickHouse driver
 	"github.com/cenkalti/backoff"
-	_ "github.com/denisenkom/go-mssqldb" // register the MS-SQL driver
+	//_ "github.com/denisenkom/go-mssqldb" // register the MS-SQL driver
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/go-sql-driver/mysql" // register the MySQL driver
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq" // register the PostgreSQL driver
+	//_ "github.com/lib/pq" // register the PostgreSQL driver
 	"github.com/prometheus/client_golang/prometheus"
-	_ "github.com/segmentio/go-athena" // register the AWS Athena driver
-	"github.com/snowflakedb/gosnowflake"
-	_ "github.com/vertica/vertica-sql-go" // register the Vertica driver
+	//_ "github.com/segmentio/go-athena" // register the AWS Athena driver
+	//"github.com/snowflakedb/gosnowflake"
+	//_ "github.com/vertica/vertica-sql-go" // register the Vertica driver
 )
 
 var (
@@ -123,48 +122,48 @@ func (j *Job) updateConnections() {
 				database: strings.TrimPrefix(u.Path, "/"),
 				user:     user,
 			}
-			if newConn.driver == "athena" {
-				// call go-athena's Open() to ensure conn.db is set,
-				// otherwise API calls will complain about an empty database field:
-				// "InvalidParameter: 1 validation error(s) found. - minimum field size of 1, StartQueryExecutionInput.QueryExecutionContext.Database."
-				newConn.conn, err = sqlx.Open("athena", u.String())
-				if err != nil {
-					level.Error(j.log).Log("msg", "Failed to open Athena connection", "connection", conn, "err", err)
-					continue
-				}
-			}
-			if newConn.driver == "snowflake" {
-				cfg := &gosnowflake.Config{
-					Account: u.Host,
-					User:    u.User.Username(),
-				}
-
-				pw, set := u.User.Password()
-				if set {
-					cfg.Password = pw
-				}
-
-				if u.Port() != "" {
-					portStr, err := strconv.Atoi(u.Port())
-					if err != nil {
-						level.Error(j.log).Log("msg", "Failed to parse Snowflake port", "connection", conn, "err", err)
-						continue
-					}
-					cfg.Port = portStr
-				}
-
-				dsn, err := gosnowflake.DSN(cfg)
-				if err != nil {
-					level.Error(j.log).Log("msg", "Failed to create Snowflake DSN", "connection", conn, "err", err)
-					continue
-				}
-
-				newConn.conn, err = sqlx.Open("snowflake", dsn)
-				if err != nil {
-					level.Error(j.log).Log("msg", "Failed to open Snowflake connection", "connection", conn, "err", err)
-					continue
-				}
-			}
+			//if newConn.driver == "athena" {
+			//	// call go-athena's Open() to ensure conn.db is set,
+			//	// otherwise API calls will complain about an empty database field:
+			//	// "InvalidParameter: 1 validation error(s) found. - minimum field size of 1, StartQueryExecutionInput.QueryExecutionContext.Database."
+			//	newConn.conn, err = sqlx.Open("athena", u.String())
+			//	if err != nil {
+			//		level.Error(j.log).Log("msg", "Failed to open Athena connection", "connection", conn, "err", err)
+			//		continue
+			//	}
+			//}
+			//if newConn.driver == "snowflake" {
+			//	cfg := &gosnowflake.Config{
+			//		Account: u.Host,
+			//		User:    u.User.Username(),
+			//	}
+			//
+			//	pw, set := u.User.Password()
+			//	if set {
+			//		cfg.Password = pw
+			//	}
+			//
+			//	if u.Port() != "" {
+			//		portStr, err := strconv.Atoi(u.Port())
+			//		if err != nil {
+			//			level.Error(j.log).Log("msg", "Failed to parse Snowflake port", "connection", conn, "err", err)
+			//			continue
+			//		}
+			//		cfg.Port = portStr
+			//	}
+			//
+			//	dsn, err := gosnowflake.DSN(cfg)
+			//	if err != nil {
+			//		level.Error(j.log).Log("msg", "Failed to create Snowflake DSN", "connection", conn, "err", err)
+			//		continue
+			//	}
+			//
+			//	newConn.conn, err = sqlx.Open("snowflake", dsn)
+			//	if err != nil {
+			//		level.Error(j.log).Log("msg", "Failed to open Snowflake connection", "connection", conn, "err", err)
+			//		continue
+			//	}
+			//}
 			j.conns = append(j.conns, newConn)
 		}
 	}
