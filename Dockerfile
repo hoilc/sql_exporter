@@ -1,31 +1,23 @@
-FROM golang:1.17-alpine as builder
+FROM golang:1.20-alpine as builder
 
-RUN apk add git bash
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+  apk add git bash
 
 ENV GO111MODULE=on
+ENV GOPROXY=https://proxy.golang.com.cn,direct
 
 # Add our code
 COPY ./ /src
 
 # build
 WORKDIR /src
-RUN GOGC=off go build -mod=vendor -v -o /sql_exporter .
+RUN go build -ldflags "-s -w" -v -o /sql_exporter .
 
 # multistage
-FROM alpine:latest
-
-RUN apk --update upgrade && \
-    apk add curl ca-certificates && \
-    apk add tzdata && \
-    update-ca-certificates && \
-    rm -rf /var/cache/apk/*
+FROM quay.io/prometheus/busybox:latest
 
 COPY --from=builder /sql_exporter /usr/bin/sql_exporter
 
-# Run the image as a non-root user
-RUN adduser -D prom
-RUN chmod 0755 /usr/bin/sql_exporter
+EXPOSE 9237
 
-USER prom
-
-CMD sql_exporter
+ENTRYPOINT [ "/usr/bin/sql_exporter" ]
